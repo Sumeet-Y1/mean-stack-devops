@@ -1,88 +1,227 @@
-# MEAN Stack CRUD Application - DevOps Deployment
+# 🚀 MEAN Stack CRUD Application - DevOps Deployment
 
-A full-stack CRUD application built with MongoDB, Express, Angular 15, and Node.js. Containerized with Docker and deployed on AWS EC2 with automated CI/CD using GitHub Actions.
+![CI/CD](https://img.shields.io/badge/CI/CD-GitHub%20Actions-blue)
+![Docker](https://img.shields.io/badge/Docker-Containerized-blue)
+![AWS](https://img.shields.io/badge/Cloud-AWS%20EC2-orange)
+![Nginx](https://img.shields.io/badge/Proxy-Nginx-green)
+![MongoDB](https://img.shields.io/badge/Database-MongoDB-green)
 
-## Tech Stack
+A full-stack CRUD application built with the MEAN stack (MongoDB, Express, Angular 15, Node.js). Fully containerized with Docker, deployed on AWS EC2, and automated with a GitHub Actions CI/CD pipeline.
 
-- **Frontend:** Angular 15
-- **Backend:** Node.js + Express
-- **Database:** MongoDB
-- **Containerization:** Docker + Docker Compose
-- **CI/CD:** GitHub Actions
-- **Reverse Proxy:** Nginx
-- **Cloud:** AWS EC2 (Ubuntu 22.04)
+---
 
-## Project Structure
+## 📚 Table of Contents
+
+- [Tech Stack](#tech-stack)
+- [Architecture](#architecture)
+- [Project Structure](#project-structure)
+- [Setup & Deployment](#setup--deployment)
+- [CI/CD Pipeline](#cicd-pipeline)
+- [Docker Images](#docker-images)
+- [Infrastructure](#infrastructure)
+- [Screenshots](#screenshots)
+
+---
+
+## 🛠️ Tech Stack
+
+| Technology | Purpose |
+|------------|---------|
+| Angular 15 | Frontend UI |
+| Node.js + Express | Backend REST API |
+| MongoDB | Database |
+| Docker + Docker Compose | Containerization |
+| GitHub Actions | CI/CD Pipeline |
+| Nginx | Reverse Proxy |
+| AWS EC2 Ubuntu 22.04 | Cloud Hosting |
+
+---
+
+## 🏗️ Architecture
+```
+                        ┌─────────────────────────────┐
+                        │        AWS EC2 VM            │
+                        │                             │
+User Request (Port 80)──►  Nginx (Reverse Proxy)      │
+                        │      │           │          │
+                        │      ▼           ▼          │
+                        │  Frontend     Backend       │
+                        │  Angular    Node.js:8080    │
+                        │               │             │
+                        │               ▼             │
+                        │           MongoDB           │
+                        │          :27017             │
+                        └─────────────────────────────┘
+```
+
+---
+
+## 📁 Project Structure
 ```
 mean-stack-devops/
-├── backend/
-│   ├── Dockerfile
-│   └── app/
-├── frontend/
-│   ├── Dockerfile
-│   └── src/
 ├── .github/
 │   └── workflows/
-│       └── deploy.yml
-├── docker-compose.yml
-├── nginx.conf
+│       └── deploy.yml          # GitHub Actions CI/CD pipeline
+├── backend/
+│   ├── Dockerfile              # Backend Docker image
+│   ├── server.js               # Express server entry point
+│   ├── package.json
+│   └── app/
+│       ├── config/
+│       │   └── db.config.js    # MongoDB connection config
+│       ├── controllers/
+│       │   └── tutorial.controller.js
+│       ├── models/
+│       │   └── tutorial.model.js
+│       └── routes/
+│           └── tutorial.routes.js
+├── frontend/
+│   ├── Dockerfile              # Frontend Docker image
+│   ├── nginx-frontend.conf     # Frontend Nginx config
+│   └── src/
+│       └── app/
+│           ├── components/     # Angular components
+│           ├── models/         # Data models
+│           └── services/       # HTTP services
+├── screenshots/                # Project screenshots
+├── docker-compose.yml          # Multi-container setup
+├── nginx.conf                  # Reverse proxy config
 └── README.md
 ```
 
-## Setup & Deployment Instructions
+---
+
+## 🚀 Setup & Deployment
 
 ### Prerequisites
-- Docker & Docker Compose installed on VM
+- AWS EC2 Ubuntu 22.04 instance
 - GitHub account
 - Docker Hub account
-- AWS EC2 Ubuntu instance
 
-### 1. Clone the Repository
+### Step 1 - Clone the Repository
 ```bash
 git clone https://github.com/Sumeet-Y1/mean-stack-devops.git
 cd mean-stack-devops
 ```
 
-### 2. Run with Docker Compose
+### Step 2 - Install Docker on Ubuntu VM
+```bash
+sudo apt update
+sudo apt install -y docker.io docker-compose
+sudo usermod -aG docker ubuntu
+newgrp docker
+```
+
+### Step 3 - Deploy with Docker Compose
 ```bash
 docker-compose up -d
 ```
 
-### 3. Access the Application
-Open your browser and navigate to:
+### Step 4 - Verify All Containers are Running
+```bash
+docker-compose ps
 ```
-http://<your-vm-ip>
+
+Expected output:
+```
+Name          Command            State         Ports
+----------------------------------------------------------
+backend    node server.js        Up      0.0.0.0:8080->8080
+frontend   nginx -g daemon off   Up      80/tcp
+mongodb    mongod                Up      0.0.0.0:27017->27017
+nginx      nginx -g daemon off   Up      0.0.0.0:80->80
 ```
 
-## CI/CD Pipeline
+### Step 5 - Access the Application
+```
+http://<your-ec2-public-ip>
+```
 
-The GitHub Actions pipeline automatically:
-1. Builds Docker images for frontend and backend
-2. Pushes images to Docker Hub
-3. SSHs into AWS EC2 VM
-4. Pulls latest images and restarts containers
+---
 
-### Pipeline Triggers
-- Automatically runs on every push to `main` branch
+## ⚙️ CI/CD Pipeline
+
+Every push to the `main` branch automatically triggers the pipeline:
+```
+Push to main
+     │
+     ▼
+Checkout Code
+     │
+     ▼
+Login to Docker Hub
+     │
+     ▼
+Build Backend Image ──► Push to Docker Hub
+     │
+     ▼
+Build Frontend Image ──► Push to Docker Hub
+     │
+     ▼
+SSH into AWS EC2 VM
+     │
+     ▼
+Pull Latest Images
+     │
+     ▼
+Restart Containers ──► App Updated! ✅
+```
 
 ### GitHub Secrets Required
+
 | Secret | Description |
 |--------|-------------|
 | `DOCKER_USERNAME` | Docker Hub username |
 | `DOCKER_PASSWORD` | Docker Hub access token |
-| `VM_HOST` | AWS EC2 public IP |
-| `VM_USER` | VM username (ubuntu) |
-| `VM_SSH_KEY` | EC2 private key (.pem) |
+| `VM_HOST` | AWS EC2 public IP address |
+| `VM_USER` | VM SSH username (ubuntu) |
+| `VM_SSH_KEY` | EC2 private key (.pem file contents) |
 
-## Docker Images
+---
 
-- **Backend:** `sumeety21/mean-backend:latest`
-- **Frontend:** `sumeety21/mean-frontend:latest`
+## 🐳 Docker Images
 
-## Infrastructure
+| Image | Docker Hub |
+|-------|------------|
+| Backend | `sumeety21/mean-backend:latest` |
+| Frontend | `sumeety21/mean-frontend:latest` |
+| Database | `mongo:6` (official) |
+| Proxy | `nginx:alpine` (official) |
 
-- **Cloud:** AWS EC2
-- **OS:** Ubuntu 22.04
-- **Instance:** t2.micro (Free Tier)
-- **Ports:** 80 (HTTP via Nginx)
+---
 
+## ☁️ Infrastructure Details
+
+| Component | Details |
+|-----------|---------|
+| Cloud Provider | AWS |
+| Instance Type | t2.micro (Free Tier) |
+| Operating System | Ubuntu 22.04 LTS |
+| Exposed Port | 80 (HTTP via Nginx) |
+| Database | MongoDB (Docker container) |
+| Container Orchestration | Docker Compose |
+
+---
+
+## 📸 Screenshots
+
+### ✅ CI/CD Pipeline Execution
+![CI/CD Pipeline](screenshots/cicd-pipeline.png)
+
+### 🐳 Docker Hub Images
+![Docker Hub](screenshots/dockerhub.png)
+
+### 🌐 Application UI
+![Application UI](screenshots/app-ui.png.png)
+
+### ☁️ AWS Infrastructure
+![AWS Infrastructure](screenshots/infrastructureAWS.png)
+
+### 🐋 Docker Infrastructure
+![Docker Infrastructure](screenshots/infrastructureDocker.png)
+
+---
+
+## 👨‍💻 Author
+
+**Sumeet** - DevOps Internship Assignment
