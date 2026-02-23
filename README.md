@@ -1,27 +1,101 @@
-In this DevOps task, you need to build and deploy a full-stack CRUD application using the MEAN stack (MongoDB, Express, Angular 15, and Node.js). The backend will be developed with Node.js and Express to provide REST APIs, connecting to a MongoDB database. The frontend will be an Angular application utilizing HTTPClient for communication.  
+# MEAN Stack CRUD Application - DevOps Deployment
 
-The application will manage a collection of tutorials, where each tutorial includes an ID, title, description, and published status. Users will be able to create, retrieve, update, and delete tutorials. Additionally, a search box will allow users to find tutorials by title.
+A full-stack CRUD application built with MongoDB, Express, Angular 15, and Node.js. Containerized with Docker and deployed on AWS EC2 with automated CI/CD using GitHub Actions.
 
-## Project setup
+## Tech Stack
 
-### Node.js Server
+- **Frontend:** Angular 15
+- **Backend:** Node.js + Express
+- **Database:** MongoDB
+- **Containerization:** Docker + Docker Compose
+- **CI/CD:** GitHub Actions
+- **Reverse Proxy:** Nginx
+- **Cloud:** AWS EC2 (Ubuntu 22.04)
 
-cd backend
+## Project Structure
+```
+mean-stack-devops/
+├── backend/
+│   ├── Dockerfile
+│   └── app/
+├── frontend/
+│   ├── Dockerfile
+│   └── src/
+├── .github/
+│   └── workflows/
+│       └── deploy.yml
+├── docker-compose.yml
+├── nginx.conf
+└── README.md
+```
 
-npm install
+## Setup & Deployment Instructions
 
-You can update the MongoDB credentials by modifying the `db.config.js` file located in `app/config/`.
+### Prerequisites
+- Docker & Docker Compose installed on VM
+- GitHub account
+- Docker Hub account
+- AWS EC2 Ubuntu instance
 
-Run `node server.js`
+### 1. Clone the Repository
+```bash
+git clone https://github.com/Sumeet-Y1/mean-stack-devops.git
+cd mean-stack-devops
+```
 
-### Angular Client
+### 2. Run with Docker Compose
+```bash
+docker-compose up -d
+```
 
-cd frontend
+### 3. Access the Application
+Open your browser and navigate to:
+```
+http://<your-vm-ip>
+```
 
-npm install
+## CI/CD Pipeline
 
-Run `ng serve --port 8081`
+The GitHub Actions pipeline automatically:
+1. Builds Docker images for frontend and backend
+2. Pushes images to Docker Hub
+3. SSHs into AWS EC2 VM
+4. Pulls latest images and restarts containers
 
-You can modify the `src/app/services/tutorial.service.ts` file to adjust how the frontend interacts with the backend.
+### Pipeline Triggers
+- Automatically runs on every push to `main` branch
 
-Navigate to `http://localhost:8081/`
+### GitHub Secrets Required
+| Secret | Description |
+|--------|-------------|
+| `DOCKER_USERNAME` | Docker Hub username |
+| `DOCKER_PASSWORD` | Docker Hub access token |
+| `VM_HOST` | AWS EC2 public IP |
+| `VM_USER` | VM username (ubuntu) |
+| `VM_SSH_KEY` | EC2 private key (.pem) |
+
+## Docker Images
+
+- **Backend:** `sumeety21/mean-backend:latest`
+- **Frontend:** `sumeety21/mean-frontend:latest`
+
+## Infrastructure
+
+- **Cloud:** AWS EC2
+- **OS:** Ubuntu 22.04
+- **Instance:** t2.micro (Free Tier)
+- **Ports:** 80 (HTTP via Nginx)
+
+## Screenshots
+
+### CI/CD Pipeline
+![CI/CD Pipeline]()
+
+### Docker Hub Images
+![Docker Hub]()
+
+### Application UI
+![Application]()
+
+### Nginx & Infrastructure
+![Infrastructure]()
