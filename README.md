@@ -86,16 +86,3 @@ The GitHub Actions pipeline automatically:
 - **Instance:** t2.micro (Free Tier)
 - **Ports:** 80 (HTTP via Nginx)
 
-## Screenshots
-
-### CI/CD Pipeline
-![CI/CD Pipeline]()
-
-### Docker Hub Images
-![Docker Hub]()
-
-### Application UI
-![Application]()
-
-### Nginx & Infrastructure
-![Infrastructure]()
