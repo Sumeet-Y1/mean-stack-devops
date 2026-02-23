@@ -37,4 +37,9 @@ jobs:
           key: ${{ secrets.VM_SSH_KEY }}
           script: |
             cd ~/mean-stack-devops
-            git pull origin
+            git pull origin main
+            docker-compose down
+            docker volume rm mean-stack-devops_mongo-data || true
+            docker rmi sumeety21/mean-frontend:latest || true
+            docker rmi sumeety21/mean-backend:latest || true
+            docker-compose up -d
